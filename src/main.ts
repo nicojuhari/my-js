@@ -5,15 +5,18 @@ import { setupCounter } from './counter'
 document.querySelector<HTMLDivElement>('#app')!.innerHTML = `
   <div>
     <a href="https://vitejs.dev" target="_blank">
-      <img src="./images/vite.svg" class="logo" alt="Vite logo" />
+      <img src="/images/vite.svg" class="logo" alt="Vite logo" />
     </a>
     <a href="https://www.typescriptlang.org/" target="_blank">
-      <img src="./images/typescript.svg" class="logo vanilla" alt="TypeScript logo" />
+      <img src="/images/typescript.svg" class="logo vanilla" alt="TypeScript logo" />
     </a>
     <h1>Vite + TypeScript</h1>
     <div class="card">
       <button id="counter" type="button"></button>
     </div>
+    <a href="about/">
+      About page
+    </a>
     <p class="read-the-docs">
       Click on the Vite and TypeScript logos to learn more
     </p>
