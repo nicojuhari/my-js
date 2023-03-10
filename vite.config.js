@@ -15,6 +15,7 @@ export default defineConfig({
             input: {
                 main: resolve(root, "index.html"),
                 about: resolve(root, "about", "index.html"),
+                "pomodoro-timer": resolve(root, "pomodoro-timer", "index.html"),
             },
         },
     },
