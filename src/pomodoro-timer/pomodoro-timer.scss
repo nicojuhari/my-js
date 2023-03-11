@@ -67,6 +67,12 @@ body {
                 width: 155px;
                 text-align: center;
                 outline: none;
+                border-radius: 6px;
+
+                &.active {
+                    border-bottom: 2px solid rgba(255, 255, 255, 0.37);
+                    background: rgba(255, 255, 255, 0.064);
+                }
         }
     }
 
@@ -82,7 +88,9 @@ body {
             border: none;
             text-transform: uppercase;
             margin-bottom: 20px;
+            margin-right: -10px;
             transition: all .3s;
+            outline: none;
 
             &:hover {
                 opacity: 1;
@@ -100,6 +108,7 @@ body {
         
         &:hover {
             opacity: 1;
+            transform: rotate(25deg);
         }
     }
 
