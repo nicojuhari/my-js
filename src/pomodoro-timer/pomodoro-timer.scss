@@ -18,18 +18,29 @@ body {
     border-radius: 50%;
     box-shadow: -5px 14px 44px #000000, 5px -16px 50px rgb(255 255 255 / 15%);
     display: flex;
-    height: 520px;
+    height: 518px;
     justify-content: center;
     position: relative;
-    width: 520px;
+    width: 518px;
     overflow: hidden;
 
     &__ring {
         position: absolute;
         left: 0;
-        stroke: #09A65A;
         top: 0;
         z-index: 1;
+
+        svg {
+            transform-origin: center;
+            rotate: -90deg;
+            fill: none;
+            
+            circle {
+                fill: none;
+                stroke-linecap: round;
+                transition: all 1s linear;
+            }
+        }
     }
     
     &__timer {
@@ -64,13 +75,13 @@ body {
                 font-family: 'Asap Condensed', sans-serif;
                 font-weight: 200;
                 height: 170px;
-                width: 155px;
+                width: 170px;
                 text-align: center;
                 outline: none;
                 border-radius: 6px;
 
                 &.active {
-                    border-bottom: 2px solid rgba(255, 255, 255, 0.37);
+                    border: 1px solid rgba(255, 255, 255, 0.25);
                     background: rgba(255, 255, 255, 0.064);
                 }
         }
