@@ -127,8 +127,8 @@
             clockBell.play()
             stopTimer()
             
-            timeMinutes.value = lastTimer.minutes < 10 ? String('0' + lastTimer.minutes) : String(lastTimer.minutes)
-            timeSeconds.value = lastTimer.seconds < 10 ? String('0' + lastTimer.seconds) : String(lastTimer.seconds)
+            // timeMinutes.value = lastTimer.minutes < 10 ? String('0' + lastTimer.minutes) : String(lastTimer.minutes)
+            // timeSeconds.value = lastTimer.seconds < 10 ? String('0' + lastTimer.seconds) : String(lastTimer.seconds)
 
             return
         }
