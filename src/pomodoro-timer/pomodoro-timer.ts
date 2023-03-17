@@ -7,15 +7,14 @@
     const clockCircle: HTMLElement = document.querySelector('svg circle');
     const clockBell: HTMLAudioElement = document.querySelector('[data-bell]')
     const clockInputs = document.querySelectorAll<HTMLInputElement>('[data-time]')
+    const restartButton = document.querySelector<HTMLButtonElement>('[data-restart]')
 
     //declare vars
-    let interval: number = null
-    // let strokeOffest = 2 * Math.PI * Number(clockCircle.getAttribute('r'));
+    let interval:number = null
     let strokeOffest = 1596;
     let strokeOffestCopy = 1596;
     let allTimeInSeconds = 0; 
     let drawSize = 0;
-
 
     let newMinutes = 0
     let newSeconds = 0
@@ -28,52 +27,155 @@
         seconds: 0
     }
 
-    //add Events
+    //start or stop timer
     clockToggler?.addEventListener('click', () => {
         if(clockBlock.dataset.clock == '0') {
 
-            if(+timeMinutes.value <= 0 && +timeSeconds.value <= 0) return
-
-            clockBlock.dataset.clock = '1'
-            strokeOffestCopy = 1596
-            
-            timeMinutes.disabled = true;
-            timeSeconds.disabled = true;
-
-            timeMinutes.classList.remove('active')
-            timeSeconds.classList.remove('active')
-
+            //set time if inputs are 00:00
+            if(+timeMinutes.value <= 0 && +timeSeconds.value <= 0) {
+                enableInputs()
+                return
+            }
+            //set last timer
             lastTimer.minutes = +timeMinutes.value
             lastTimer.seconds = +timeSeconds.value
-            
-            allTimeInSeconds  = +timeMinutes.value * 60 + +timeSeconds.value;
-            drawSize =  strokeOffest / allTimeInSeconds
-            
-            clockToggler.innerText = 'STOP'
-            setCircleColor('#09A65A')
+
             startTimer()
-            
-            interval = setInterval(() => { startTimer() }, 1000)
 
         } else {
             stopTimer()
         }
     })
 
+    //set new time
     clockSettings.addEventListener('click', () => {
-        if(clockToggler.dataset.start = '1') {
-
-        }
         stopTimer()
-        clockToggler.innerText = 'START'
-        timeMinutes.disabled = false;
-        timeSeconds.disabled = false;
 
-        timeMinutes.classList.add('active')
-        timeSeconds.classList.add('active')
+        //enable inputs
+        enableInputs()
 
         timeMinutes.focus()
     })
+
+    
+
+    //restart event 
+    restartButton.addEventListener('click', () => {
+        timeMinutes.value = lastTimer.minutes < 10 ? String('0' + lastTimer.minutes) : String(lastTimer.minutes)
+        timeSeconds.value = lastTimer.seconds < 10 ? String('0' + lastTimer.seconds) : String(lastTimer.seconds)
+            
+        startTimer()
+    })
+
+    //declare functions
+    const calcTime = () => {
+    
+        currentMinutes = Number(timeMinutes?.value)
+        currentSeconds = Number(timeSeconds?.value) //because we skip first iteration
+
+        //calc newMinutes
+        newMinutes = currentMinutes
+        if(currentSeconds == 0 ) {
+            newMinutes = currentMinutes - 1;
+            currentSeconds = 60
+        }
+        //calc newSeconds
+        newSeconds = currentSeconds - 1;
+
+        // if(newSeconds < 0) newSeconds = 0
+        // if(newMinutes < 0) newMinutes = 0
+
+        //update inputs
+        timeMinutes.value = newMinutes < 10 ? String('0' + newMinutes) : String(newMinutes)
+        timeSeconds.value = newSeconds < 10 ? String('0' + newSeconds) : String(newSeconds)
+
+        //draw circle
+        strokeOffestCopy = Math.round(strokeOffestCopy - drawSize)
+        drawCircle(strokeOffestCopy)
+
+        //stop the watch
+        if(newSeconds == 0 && newMinutes == 0) {
+            
+            clockBell.play()
+            stopTimer()
+
+            setTimeout(() => {
+                restartButton.classList.add('active')},
+            2000)
+            
+            return
+        }
+
+    }
+
+    const startTimer = () => {
+
+        clockBlock.dataset.clock = '1'
+        restartButton.classList.remove('active')
+        clockToggler.innerText = 'STOP'
+        setCircleColor('#09A65A')
+        
+        //disable inputs
+        enableInputs(false)
+        
+        allTimeInSeconds  = lastTimer.minutes * 60 + lastTimer.seconds;
+        drawSize =  strokeOffest / allTimeInSeconds
+        
+        //start to draw first
+        strokeOffestCopy = Math.round(strokeOffestCopy - drawSize)
+        drawCircle(strokeOffestCopy)
+        // calcTime()
+        
+        interval = setInterval(() => { calcTime() }, 1000)
+    }
+
+    const stopTimer = () => {
+        clearInterval(interval)
+
+        setCircleColor('red')
+
+        setTimeout(() => {
+            setCircleColor('transparent')
+        }, 1000)
+
+        setTimeout(() => {
+            resetCircle()
+            clockToggler.innerText = 'START'
+            clockBlock.dataset.clock = '0'
+        }, 2000)
+
+    }
+
+    const drawCircle = (value: number) => {
+
+        //on last draw, reset circle
+        if(value <= 0) {
+            value = 0;
+        }
+
+        clockCircle.setAttribute('stroke-dashoffset', String(value))
+    }
+
+    const resetCircle = () => {
+        strokeOffestCopy = 1596
+        clockCircle.setAttribute('stroke-dashoffset', String(1596))
+    }
+
+    const setCircleColor = (color: string) => {
+        clockCircle.setAttribute('stroke', color)
+    }
+
+    const enableInputs = (active = true) => {
+        timeMinutes.disabled = active ? false : true
+        timeSeconds.disabled = active ? false : true
+
+        active && timeMinutes.focus()
+
+        //toggle class
+        active ? timeMinutes.classList.add('active') : timeMinutes.classList.remove('active')
+        active ? timeSeconds.classList.add('active') : timeSeconds.classList.remove('active')
+
+    }
 
     Array.from(clockInputs).forEach(item => {
         item.addEventListener('input', () => {
@@ -103,78 +205,30 @@
             }
 
             item.value = currentVal < 10 ? String('0' + currentVal) : String(currentVal)
-            clockCircle.setAttribute('stroke-dashoffset', '1596')
+            
+            resetCircle()
             strokeOffestCopy = strokeOffest
             
         })
 
         item.addEventListener('focus', () => {
-            //move the cursor at the end
+            //move the cursor at the end of the input
             let currentVal = item.value
             item.value = ''
             item.value = currentVal
         })
+
     });
 
-    //declare functions
-    const startTimer = () => {
-    
-        currentMinutes = Number(timeMinutes?.value)
-        currentSeconds = Number(timeSeconds?.value)
 
-        //stop the watch
-        if(currentMinutes == 0 && currentSeconds == 0) {
-            clockBell.play()
-            stopTimer()
-            
-            // timeMinutes.value = lastTimer.minutes < 10 ? String('0' + lastTimer.minutes) : String(lastTimer.minutes)
-            // timeSeconds.value = lastTimer.seconds < 10 ? String('0' + lastTimer.seconds) : String(lastTimer.seconds)
-
-            return
+    document.addEventListener('click', () => {
+        //if click outside inputs, disable them
+        if(document.activeElement != timeMinutes && document.activeElement != timeSeconds) {
+            enableInputs(false)
         }
 
-        //draw circle
-        strokeOffestCopy = Math.round(strokeOffestCopy - drawSize)
-        drawCircle(strokeOffestCopy)
+     })
 
-        //calc newMinutes
-        newMinutes = currentMinutes
-        if(currentSeconds == 0 ) {
-            newMinutes = currentMinutes - 1;
-            currentSeconds = 60
-        }
-        //calc newSeconds
-        newSeconds = currentSeconds - 1;
-
-        //update inputs
-        timeMinutes.value = newMinutes < 10 ? String('0' + newMinutes) : String(newMinutes)
-        timeSeconds.value = newSeconds < 10 ? String('0' + newSeconds) : String(newSeconds)
-    }
-    const stopTimer = () => {
-        clearInterval(interval)
-        clockToggler.innerText = 'START'
-        clockBlock.dataset.clock = '0'
-    }
-
-    const drawCircle = (value: number) => {
-        if(value <= 0) {
-            value = 0;
-            setCircleColor('red')
-
-            setTimeout(() => {
-                setCircleColor('transparent')
-            }, 1000)
-
-             setTimeout(() => {
-                clockCircle.setAttribute('stroke-dashoffset', String(1596))
-            }, 2000)
-        }
-        clockCircle.setAttribute('stroke-dashoffset', String(value))
-    }
-
-    const setCircleColor = (color: string) => {
-        clockCircle.setAttribute('stroke', color)
-    }
 
     
     export {}
