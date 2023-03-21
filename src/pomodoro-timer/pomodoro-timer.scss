@@ -24,6 +24,16 @@ body {
     width: 518px;
     overflow: hidden;
 
+    &[data-clock="1"], &[data-clock="2"] {
+        .clock__ring {
+            svg {
+                circle {
+                    transition: all 1s linear;
+                }
+            }
+        }
+    }
+
     &__ring {
         position: absolute;
         left: 0;
@@ -38,7 +48,7 @@ body {
             circle {
                 fill: none;
                 stroke-linecap: round;
-                transition: all 1s linear;
+                // transition: all 1s linear;
             }
         }
     }

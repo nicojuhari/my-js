@@ -41,8 +41,10 @@
             lastTimer.seconds = +timeSeconds.value
 
             startTimer()
+            return
+        }
 
-        } else {
+        if(clockBlock.dataset.clock == '1') {
             stopTimer()
         }
     })
@@ -56,8 +58,6 @@
 
         timeMinutes.focus()
     })
-
-    
 
     //restart event 
     restartButton.addEventListener('click', () => {
@@ -82,9 +82,6 @@
         //calc newSeconds
         newSeconds = currentSeconds - 1;
 
-        // if(newSeconds < 0) newSeconds = 0
-        // if(newMinutes < 0) newMinutes = 0
-
         //update inputs
         timeMinutes.value = newMinutes < 10 ? String('0' + newMinutes) : String(newMinutes)
         timeSeconds.value = newSeconds < 10 ? String('0' + newSeconds) : String(newSeconds)
@@ -101,7 +98,7 @@
 
             setTimeout(() => {
                 restartButton.classList.add('active')},
-            2000)
+            1000)
             
             return
         }
@@ -124,14 +121,14 @@
         //start to draw first
         strokeOffestCopy = Math.round(strokeOffestCopy - drawSize)
         drawCircle(strokeOffestCopy)
-        // calcTime()
         
         interval = setInterval(() => { calcTime() }, 1000)
     }
 
     const stopTimer = () => {
         clearInterval(interval)
-
+        clockBlock.dataset.clock = '2'
+        
         setCircleColor('red')
 
         setTimeout(() => {
@@ -139,9 +136,9 @@
         }, 1000)
 
         setTimeout(() => {
+            clockBlock.dataset.clock = '0'
             resetCircle()
             clockToggler.innerText = 'START'
-            clockBlock.dataset.clock = '0'
         }, 2000)
 
     }
@@ -230,5 +227,4 @@
      })
 
 
-    
     export {}
